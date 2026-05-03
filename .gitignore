@@ -1,0 +1,5 @@
+touch .gitignore
+bin/
+obj/
+*.user
+.vscode/
