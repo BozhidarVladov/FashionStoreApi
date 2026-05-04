@@ -1,12 +1,10 @@
-using FashionStoreApi.Models;
+namespace VladovClothingStore;
 
-namespace FashionStoreApi.Services
+public interface IStoreService
 {
-    public interface IStoreService
-    {
-        List<ClothingItem> GetAll();
-        ClothingItem GetById(int id);
-        void Add(ClothingItem item);
-        bool Delete(int id);
-    }
+    Task<IEnumerable<ClothingItem>> GetAllItemsAsync();
+    Task<ClothingItem?> GetItemByIdAsync(int id);
+    Task AddItemAsync(ClothingItem item);
+    Task UpdateItemAsync(ClothingItem item);
+    Task DeleteItemAsync(int id);
 }

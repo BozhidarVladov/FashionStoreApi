@@ -1,5 +1,5 @@
-touch .gitignore
 bin/
 obj/
+*.db
 *.user
 .vscode/

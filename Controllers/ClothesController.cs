@@ -1,43 +1,60 @@
 using Microsoft.AspNetCore.Mvc;
-using FashionStoreApi.Models;
-using FashionStoreApi.Services;
+using VladovClothingStore;
 
-namespace FashionStoreApi.Controllers
+namespace VladovClothingStore.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Produces("application/json")]
+public class ClothesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ClothesController : ControllerBase
+    private readonly IStoreService _service;
+
+    public ClothesController(IStoreService service)
     {
-        private readonly IStoreService _storeService;
+        _service = service;
+    }
 
-        public ClothesController(IStoreService storeService)
-        {
-            _storeService = storeService;
-        }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ClothingItem>>> GetAll()
+    {
+        return Ok(await _service.GetAllItemsAsync());
+    }
 
-        [HttpGet]
-        public ActionResult<List<ClothingItem>> GetAll() => Ok(_storeService.GetAll());
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ClothingItem>> GetById(int id)
+    {
+        var item = await _service.GetItemByIdAsync(id);
+        if (item == null) return NotFound();
+        return Ok(item);
+    }
 
-        [HttpGet("{id}")]
-        public ActionResult<ClothingItem> Get(int id)
-        {
-            var item = _storeService.GetById(id);
-            if (item == null) return NotFound();
-            return Ok(item);
-        }
+    [HttpPost]
+    public async Task<ActionResult> Add(ClothingItem item)
+    {
+        await _service.AddItemAsync(item);
+        return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
+    }
 
-        [HttpPost]
-        public IActionResult Create(ClothingItem item)
-        {
-            _storeService.Add(item);
-            return CreatedAtAction(nameof(Get), new { id = item.Id }, item);
-        }
+    [HttpPut("{id}")]
+    public async Task<ActionResult> Update(int id, ClothingItem item)
+    {
+        if (id != item.Id) return BadRequest();
+        
+        var existing = await _service.GetItemByIdAsync(id);
+        if (existing == null) return NotFound();
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            if (!_storeService.Delete(id)) return NotFound();
-            return NoContent();
-        }
+        await _service.UpdateItemAsync(item);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        var existing = await _service.GetItemByIdAsync(id);
+        if (existing == null) return NotFound();
+
+        await _service.DeleteItemAsync(id);
+        return NoContent();
     }
 }
