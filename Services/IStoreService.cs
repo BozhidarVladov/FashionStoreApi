@@ -1,10 +1,17 @@
-namespace VladovClothingStore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using VladovClothingStore.Models;
+using VladovClothingStore.Dtos;
 
+namespace VladovClothingStore.Services{
 public interface IStoreService
 {
-    Task<IEnumerable<ClothingItem>> GetAllItemsAsync();
-    Task<ClothingItem?> GetItemByIdAsync(int id);
-    Task AddItemAsync(ClothingItem item);
-    Task UpdateItemAsync(ClothingItem item);
-    Task DeleteItemAsync(int id);
+    Task <List<ClothingReadDto>> GetAllClothesAsync();
+    Task<ClothingReadDto?> GetClothingByIdAsync(int id);
+
+    Task AddClothingAsync(ClothingItem item);
+    Task UpdateClothingAsync(ClothingItem item);
+    Task DeleteClothingAsync(int id);
+
+}
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VladovClothingStore;
+using VladovClothingStore.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,17 +14,15 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.EnsureCreated(); // Това създава таблиците, ако ги няма
-}
-
-if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Vladov Clothing Store API V1");
+        c.RoutePrefix = "swagger";
+    });
 }
 
+app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
