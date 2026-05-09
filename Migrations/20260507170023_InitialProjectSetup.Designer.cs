@@ -13,7 +13,6 @@ namespace VladovClothingStore.Migrations
     [Migration("20260507170023_InitialProjectSetup")]
     partial class InitialProjectSetup
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618

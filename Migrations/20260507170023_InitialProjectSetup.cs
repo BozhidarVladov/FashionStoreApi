@@ -4,10 +4,10 @@
 
 namespace VladovClothingStore.Migrations
 {
-    /// <inheritdoc />
+   
     public partial class InitialProjectSetup : Migration
     {
-        /// <inheritdoc />
+   
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -50,7 +50,7 @@ namespace VladovClothingStore.Migrations
                 column: "CategoryId");
         }
 
-        /// <inheritdoc />
+        
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

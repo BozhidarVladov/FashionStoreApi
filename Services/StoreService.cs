@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using VladovClothingStore.Models;
@@ -27,7 +28,7 @@ public class StoreService : IStoreService
             Id = c.Id,
             Name = c.Name,
             Price = c.Price,
-            CategoryName = c.Category != null ? c.Category.name : "No Category"
+            CategoryName = c.Category != null ? c.Category.Name : "No Category"
         }).ToList();
     }
 
@@ -44,7 +45,7 @@ public class StoreService : IStoreService
             Id = item.Id,
             Name = item.Name,
             Price = item.Price,
-            CategoryName = item.Category != null ? item.Category.name : "No Category"
+            CategoryName = item.Category != null ? item.Category.Name : "No Category"
         };
     }
 
