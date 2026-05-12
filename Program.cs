@@ -41,7 +41,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=fashion.db"));
 
-var key = Encoding.UTF8.GetBytes("VladovStore_Super_Secret_Key_2026_Unique!");
+var key = Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012"); 
 
 builder.Services.AddAuthentication(options =>
 {
@@ -50,19 +50,17 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false;
+    options.RequireHttpsMetadata = false; // Важно!
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        
-        ValidateIssuer = false, 
-        ValidateAudience = false, 
-        
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012")),
         RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-        ClockSkew = TimeSpan.Zero 
+        ClockSkew = TimeSpan.Zero
     };
 });
 

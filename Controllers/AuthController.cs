@@ -71,8 +71,9 @@ namespace VladovClothingStore.Controllers
                 new Claim(ClaimTypes.Role, "Admin")
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("VladovStore_Super_Secret_Key_2026_Unique!"));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var key = Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012");
+            var securityKey = new SymmetricSecurityKey(key);
+            var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 issuer: "VladovStore",

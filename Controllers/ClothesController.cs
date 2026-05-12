@@ -51,7 +51,7 @@ public class ClothesController : ControllerBase
     } 
 
     [HttpPut("{id}")] 
-    [Authorize(Roles = "Admin")] 
+    [Authorize] 
     public async Task<ActionResult> Update(int id, ClothingCreateDto dto) 
     { 
         var existing = await _service.GetClothingByIdAsync(id); 
