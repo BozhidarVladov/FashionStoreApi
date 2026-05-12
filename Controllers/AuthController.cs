@@ -1,99 +1,88 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks; 
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System;
-using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using VladovClothingStore.Models;
 
-namespace VladovClothingStore.Controllers
+namespace VladovClothingStore.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class AuthController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AuthController : ControllerBase
+    private readonly ApplicationDbContext _context;
+
+    public AuthController(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IConfiguration _configuration;
-
-        public AuthController(ApplicationDbContext context, IConfiguration configuration)
-        {
-            _context = context;
-            _configuration = configuration;
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(UserDto request)
-        {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-            {
-                return BadRequest("Потребител с този имейл вече съществува.");
-            }
-
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-            var user = new User
-            {
-                Email = request.Email,
-                PasswordHash = passwordHash,
-                Role = "Admin"
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok("Потребителят е регистриран успешно!");
-        }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(UserDto request)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            {
-                return BadRequest("Грешен имейл или парола.");
-            }
-
-            var token = CreateToken(user);
-            return Ok(new { token });
-        }
-
-        private string CreateToken(User user)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, "Admin")
-            };
-
-            // КЛЮЧЪТ ТРЯБВА ДА Е СЪЩИЯ КАТО В PROGRAM.CS
-            var keyBytes = Encoding.UTF8.GetBytes("vladov_store_secret_key_2026_safe");
-            var securityKey = new SymmetricSecurityKey(keyBytes);
-            var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: "VladovStore",
-                audience: "VladovStoreUsers",
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+        _context = context;
     }
 
-    public class UserDto
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(UserDto request)
     {
-        [Required, EmailAddress]
-        public required string Email { get; set; }
-        
-        [Required, MinLength(6)]
-        public required string Password { get; set; }
+        if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            return BadRequest("Потребител с този имейл вече съществува.");
+
+        var user = new User
+        {
+            Email = request.Email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Role = "Admin"
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return Ok("Регистрацията е успешна!");
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(UserDto request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            return BadRequest("Грешен имейл или парола.");
+
+        var token = CreateToken(user);
+
+        return Ok(new { token });
+    }
+
+    private string CreateToken(User user)
+    {
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes("123456789012345678901234567890ab"));
+
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role ?? "User")
+        };
+
+        var token = new JwtSecurityToken(
+            claims: claims,
+            expires: DateTime.UtcNow.AddDays(1),
+            signingCredentials: creds
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+}
+
+public class UserDto
+{
+    [Required, EmailAddress]
+    public string Email { get; set; }
+
+    [Required, MinLength(6)]
+    public string Password { get; set; }
 }
