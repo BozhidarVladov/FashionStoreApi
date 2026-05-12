@@ -36,27 +36,41 @@ public class ClothesController : ControllerBase
     } 
 
     [HttpPost] 
-    [Authorize]
-    public async Task<ActionResult> Add(ClothingItem item) 
+    [Authorize(Roles = "Admin")] 
+    public async Task<ActionResult> Add(ClothingCreateDto dto) 
     { 
+        var item = new ClothingItem 
+        {
+            Name = dto.Name,
+            Price = dto.Price,
+            CategoryId = dto.CategoryId
+        };
+
         await _service.AddClothingAsync(item); 
         return CreatedAtAction(nameof(GetById), new { id = item.Id }, item); 
     } 
 
     [HttpPut("{id}")] 
-    [Authorize] 
-    public async Task<ActionResult> Update(int id, ClothingItem item) 
+    [Authorize(Roles = "Admin")] 
+    public async Task<ActionResult> Update(int id, ClothingCreateDto dto) 
     { 
-        if (id != item.Id) return BadRequest(); 
         var existing = await _service.GetClothingByIdAsync(id); 
         if (existing == null) return NotFound(); 
 
-        await _service.UpdateClothingAsync(item); 
+        var itemToUpdate = new ClothingItem 
+        { 
+            Id = id, 
+            Name = dto.Name, 
+            Price = dto.Price, 
+            CategoryId = dto.CategoryId 
+        };
+
+        await _service.UpdateClothingAsync(itemToUpdate); 
         return NoContent(); 
     } 
 
     [HttpDelete("{id}")] 
-    [Authorize] 
+    [Authorize(Roles = "Admin")] 
     public async Task<ActionResult> Delete(int id) 
     { 
         var existing = await _service.GetClothingByIdAsync(id); 

@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
+using System.ComponentModel.DataAnnotations;
 using VladovClothingStore.Models;
 
 namespace VladovClothingStore.Controllers
@@ -28,13 +29,18 @@ namespace VladovClothingStore.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserDto request)
         {
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            {
+                return BadRequest("Потребител с този имейл вече съществува.");
+            }
+
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
             var user = new User
             {
                 Email = request.Email,
                 PasswordHash = passwordHash,
-                Role = "User"
+                Role = "Admin"
             };
 
             _context.Users.Add(user);
@@ -54,7 +60,7 @@ namespace VladovClothingStore.Controllers
             }
 
             var token = CreateToken(user);
-            return Ok(token);
+            return Ok(new { token });
         }
 
         private string CreateToken(User user)
@@ -62,15 +68,15 @@ namespace VladovClothingStore.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, "Admin")
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("Jwt:Key").Value!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("VladovStore_Super_Secret_Key_2026_Unique!"));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration.GetSection("Jwt:Issuer").Value,
-                audience: _configuration.GetSection("Jwt:Audience").Value,
+                issuer: "VladovStore",
+                audience: "VladovStoreUsers",
                 claims: claims,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: creds
@@ -82,7 +88,10 @@ namespace VladovClothingStore.Controllers
 
     public class UserDto
     {
+        [Required, EmailAddress]
         public required string Email { get; set; }
+        
+        [Required, MinLength(6)]
         public required string Password { get; set; }
     }
 }
