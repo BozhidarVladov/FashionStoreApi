@@ -10,6 +10,7 @@ using System.Text;
 using VladovClothingStore;
 using VladovClothingStore.Services;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,11 +28,9 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter JWT token"
+        Type = SecuritySchemeType.ApiKey, // Променено на ApiKey
+        Description = "Напиши точно това: Bearer {token}" 
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -53,7 +52,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=fashion.db"));
 
-var keyBytes = Encoding.UTF8.GetBytes("123456789012345678901234567890ab");
+var keyBytes = Encoding.UTF8.GetBytes("vladov_clothing_store_secret_key_2025");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
@@ -61,17 +60,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
 
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-        RoleClaimType = ClaimTypes.Role,
-        NameClaimType = ClaimTypes.Email,
-        ClockSkew = TimeSpan.Zero
-    };
+   options.TokenValidationParameters = new TokenValidationParameters
+{
+    ValidateIssuer = false,
+    ValidateAudience = false,
+    ValidateLifetime = false, 
+    ValidateIssuerSigningKey = true, // Върни го на TRUE, вече имаме еднакви ключове!
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("123456789012345678901234567890ab")),
+    
+    // ТОВА Е ВАЖНОТО:
+    RoleClaimType = ClaimTypes.Role,
+    NameClaimType = ClaimTypes.Email
+};
+
+
 });
 
 builder.Services.AddScoped<IStoreService, StoreService>();

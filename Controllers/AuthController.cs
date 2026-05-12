@@ -57,16 +57,16 @@ public class AuthController : ControllerBase
 
     private string CreateToken(User user)
     {
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes("123456789012345678901234567890ab"));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladov_clothing_store_secret_key_2025"));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role ?? "User")
-        };
+{
+    new Claim(JwtRegisteredClaimNames.Sub, user.Email), // Добави това
+    new Claim(ClaimTypes.Email, user.Email),
+    new Claim(ClaimTypes.Role, user.Role ?? "User")
+};
 
         var token = new JwtSecurityToken(
             claims: claims,
