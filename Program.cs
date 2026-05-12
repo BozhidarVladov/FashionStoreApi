@@ -41,7 +41,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=fashion.db"));
 
-var key = Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012"); 
+// Използваме този конкретен ключ за абсолютна точност
+var keyBytes = Encoding.UTF8.GetBytes("vladov_store_secret_key_2026_safe");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -50,7 +51,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // Важно!
+    options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -58,7 +59,7 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012")),
+        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
         RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
         ClockSkew = TimeSpan.Zero
     };
@@ -76,8 +77,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
-app.Run();
+app.Run();  

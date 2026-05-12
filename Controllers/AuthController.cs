@@ -71,8 +71,9 @@ namespace VladovClothingStore.Controllers
                 new Claim(ClaimTypes.Role, "Admin")
             };
 
-            var key = Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012");
-            var securityKey = new SymmetricSecurityKey(key);
+            // КЛЮЧЪТ ТРЯБВА ДА Е СЪЩИЯ КАТО В PROGRAM.CS
+            var keyBytes = Encoding.UTF8.GetBytes("vladov_store_secret_key_2026_safe");
+            var securityKey = new SymmetricSecurityKey(keyBytes);
             var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(

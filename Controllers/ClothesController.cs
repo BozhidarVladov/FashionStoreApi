@@ -11,6 +11,7 @@ namespace VladovClothingStore.Controllers;
 [ApiController] 
 [Route("api/[controller]")] 
 [Produces("application/json")] 
+[Authorize] // Това защитава целия контролер
 public class ClothesController : ControllerBase 
 { 
     private readonly IStoreService _service; 
@@ -21,62 +22,19 @@ public class ClothesController : ControllerBase
     } 
 
     [HttpGet]
+    [AllowAnonymous] // Позволява на всички да разглеждат дрехите
     public async Task<ActionResult<IEnumerable<ClothingReadDto>>> GetAll() 
     { 
         var clothes = await _service.GetAllClothesAsync(); 
         return Ok(clothes); 
     } 
 
-    [HttpGet("{id}")] 
-    public async Task<ActionResult<ClothingReadDto>> GetById(int id) 
+    [HttpPost]
+    public async Task<ActionResult> Create([FromBody] ClothingCreateDto dto) 
     { 
-        var item = await _service.GetClothingByIdAsync(id); 
-        if (item == null) return NotFound(); 
-        return Ok(item); 
-    } 
-
-    [HttpPost] 
-    [Authorize(Roles = "Admin")] 
-    public async Task<ActionResult> Add(ClothingCreateDto dto) 
-    { 
-        var item = new ClothingItem 
-        {
-            Name = dto.Name,
-            Price = dto.Price,
-            CategoryId = dto.CategoryId
-        };
-
+        if (dto == null) return BadRequest();
+        var item = new ClothingItem { Name = dto.Name, Price = dto.Price, CategoryId = dto.CategoryId };
         await _service.AddClothingAsync(item); 
-        return CreatedAtAction(nameof(GetById), new { id = item.Id }, item); 
-    } 
-
-    [HttpPut("{id}")] 
-    [Authorize] 
-    public async Task<ActionResult> Update(int id, ClothingCreateDto dto) 
-    { 
-        var existing = await _service.GetClothingByIdAsync(id); 
-        if (existing == null) return NotFound(); 
-
-        var itemToUpdate = new ClothingItem 
-        { 
-            Id = id, 
-            Name = dto.Name, 
-            Price = dto.Price, 
-            CategoryId = dto.CategoryId 
-        };
-
-        await _service.UpdateClothingAsync(itemToUpdate); 
-        return NoContent(); 
-    } 
-
-    [HttpDelete("{id}")] 
-    [Authorize(Roles = "Admin")] 
-    public async Task<ActionResult> Delete(int id) 
-    { 
-        var existing = await _service.GetClothingByIdAsync(id); 
-        if (existing == null) return NotFound(); 
-
-        await _service.DeleteClothingAsync(id); 
-        return NoContent(); 
+        return Ok(item);
     } 
 }
