@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,10 +17,12 @@ namespace VladovClothingStore.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
+    private readonly IConfiguration _configuration;
     private readonly ApplicationDbContext _context;
 
-    public AuthController(ApplicationDbContext context)
+    public AuthController(IConfiguration configuration, ApplicationDbContext context)
     {
+        _configuration = configuration;
         _context = context;
     }
 
@@ -57,16 +60,23 @@ public class AuthController : ControllerBase
 
     private string CreateToken(User user)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladov_clothing_store_secret_key_2025"));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012"));
+        // var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? ""));
+        //var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladov_clothing_store_secret_key_2025"));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
         var claims = new List<Claim>
-{
-    new Claim(JwtRegisteredClaimNames.Sub, user.Email), // Добави това
-    new Claim(ClaimTypes.Email, user.Email),
-    new Claim(ClaimTypes.Role, user.Role ?? "User")
-};
+    {
+        new Claim(ClaimTypes.Name, user.Email),
+        new Claim(ClaimTypes.Role, user.Role) // Тук user.Role трябва да е стринг "Admin" или "User"
+    };
+
+//         var claims = new List<Claim>
+// {
+//     new Claim(JwtRegisteredClaimNames.Sub, user.Email), 
+//     new Claim(ClaimTypes.Email, user.Email),
+//     new Claim(ClaimTypes.Role, user.Role ?? "User")
+// };
 
         var token = new JwtSecurityToken(
             claims: claims,
@@ -81,8 +91,8 @@ public class AuthController : ControllerBase
 public class UserDto
 {
     [Required, EmailAddress]
-    public string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
 
     [Required, MinLength(6)]
-    public string Password { get; set; }
+    public string Password { get; set; } = string.Empty;
 }

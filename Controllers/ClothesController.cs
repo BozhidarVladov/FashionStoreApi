@@ -11,6 +11,7 @@ namespace VladovClothingStore.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+// [AllowAnonymous]
 [Authorize]
 public class ClothesController : ControllerBase
 {
@@ -30,7 +31,8 @@ public class ClothesController : ControllerBase
     }
 
     [HttpPost]
-    [AllowAnonymous]
+    // [AllowAnonymous]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Create([FromBody] ClothingCreateDto dto)
     {
         if (dto == null)
@@ -45,5 +47,13 @@ public class ClothesController : ControllerBase
 
         await _service.AddClothingAsync(item);
         return Ok(item);
+    }
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+       await _service.DeleteClothingAsync(id);
+
+        return NoContent();
     }
 }

@@ -29,7 +29,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey, // Променено на ApiKey
+        Type = SecuritySchemeType.ApiKey,
         Description = "Напиши точно това: Bearer {token}" 
     });
 
@@ -54,27 +54,26 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var keyBytes = Encoding.UTF8.GetBytes("vladov_clothing_store_secret_key_2025");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-
-   options.TokenValidationParameters = new TokenValidationParameters
-{
-    ValidateIssuer = false,
-    ValidateAudience = false,
-    ValidateLifetime = false, 
-    ValidateIssuerSigningKey = true, // Върни го на TRUE, вече имаме еднакви ключове!
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("123456789012345678901234567890ab")),
-    
-    // ТОВА Е ВАЖНОТО:
-    RoleClaimType = ClaimTypes.Role,
-    NameClaimType = ClaimTypes.Email
-};
-
-
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = false, 
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012")),
+        
+        RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+        NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+    };
 });
+
 
 builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddAuthorization();
