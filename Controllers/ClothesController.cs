@@ -11,8 +11,6 @@ namespace VladovClothingStore.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-// [AllowAnonymous]
-[Authorize]
 public class ClothesController : ControllerBase
 {
     private readonly IStoreService _service;
@@ -29,10 +27,9 @@ public class ClothesController : ControllerBase
         var clothes = await _service.GetAllClothesAsync();
         return Ok(clothes);
     }
-
-    [HttpPost]
-    // [AllowAnonymous]
     [Authorize(Roles = "Admin")]
+    [HttpPost]
+    
     public async Task<ActionResult> Create([FromBody] ClothingCreateDto dto)
     {
         if (dto == null)

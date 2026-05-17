@@ -11,6 +11,7 @@ using VladovClothingStore;
 using VladovClothingStore.Services;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,7 +53,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=fashion.db"));
 
-var keyBytes = Encoding.UTF8.GetBytes("vladov_clothing_store_secret_key_2025");
+var keyBytes = Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -61,18 +62,35 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.RequireHttpsMetadata = false;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = false, 
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true, 
         ValidateIssuerSigningKey = true,
+
+        ValidIssuer = "VladovAPI",
+        ValidAudience = "VladovAPI",
+
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012")),
-        
-        RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-        NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.Name,
+
+        ClockSkew = TimeSpan.Zero
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("TOKEN ERROR: " + context.Exception.Message);
+            return Task.CompletedTask;
+        }
     };
 });
+
+
 
 
 builder.Services.AddScoped<IStoreService, StoreService>();

@@ -60,9 +60,8 @@ public class AuthController : ControllerBase
 
     private string CreateToken(User user)
     {
+        Console.WriteLine($"USER ROLE: {user.Role}");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012"));
-        // var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? ""));
-        //var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladov_clothing_store_secret_key_2025"));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var claims = new List<Claim>
@@ -71,14 +70,9 @@ public class AuthController : ControllerBase
         new Claim(ClaimTypes.Role, user.Role) // Тук user.Role трябва да е стринг "Admin" или "User"
     };
 
-//         var claims = new List<Claim>
-// {
-//     new Claim(JwtRegisteredClaimNames.Sub, user.Email), 
-//     new Claim(ClaimTypes.Email, user.Email),
-//     new Claim(ClaimTypes.Role, user.Role ?? "User")
-// };
-
         var token = new JwtSecurityToken(
+            issuer: "VladovAPI",
+            audience: "VladovAPI",
             claims: claims,
             expires: DateTime.UtcNow.AddDays(1),
             signingCredentials: creds
