@@ -12,6 +12,7 @@ using VladovClothingStore.Services;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
+using VladovClothingStore.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,6 +104,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseRouting();
 

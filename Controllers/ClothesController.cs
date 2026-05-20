@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using VladovClothingStore.Models;
 using VladovClothingStore.Dtos;
+using System;
 using VladovClothingStore.Services;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -53,4 +55,22 @@ public class ClothesController : ControllerBase
 
         return NoContent();
     }
+    [HttpPost("{id}/buy")]
+[Authorize]
+public async Task<IActionResult> BuyClothing(int id)
+{
+    var clothes = await _service.GetAllClothesAsync();
+    var clothing = clothes.FirstOrDefault(c => c.Id == id);
+
+    if (clothing == null)
+    {
+        return NotFound(new { message = $"Дреха с ID {id} не беше намерена." });
+    }
+
+    return Ok(new 
+    { 
+        message = $"Успешна покупка! Закупихте {clothing.Name} на цена {clothing.Price} лв.",
+        purchaseDate = DateTime.UtcNow
+    });
+}
 }
