@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using VladovClothingStore.Models;
+using VladovClothingStore.Services;
 
 namespace VladovClothingStore.Controllers;
 
@@ -19,11 +20,13 @@ public class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly ApplicationDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public AuthController(IConfiguration configuration, ApplicationDbContext context)
+    public AuthController(IConfiguration configuration, ApplicationDbContext context, IEmailService emailService)
     {
         _configuration = configuration;
         _context = context;
+        _emailService = emailService;
     }
 
     [HttpPost("register")]
@@ -41,6 +44,18 @@ public class AuthController : ControllerBase
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
+        string recipientEmail = request.Email;
+        string subject = "Добре дошли във Vladov Clothing Store! 🎉";
+
+        string messageBody = $@"
+        <h1>Здравейте и добре дошли!</h1>
+        <p>Благодарим ви, че се регистрирахте във <strong>Vladov Clothing Store</strong>.</p>
+        <p>Вашият профил беше създаден успешно с имейл: <strong>{request.Email}</strong>.</p>
+        <p>Вече можете да разгледате най-новите ни колекции дрехи и да направите първата си поръчка!</p>
+        <br/>
+        <p>Поздрави,<br/>Екипът на Vladov Clothing Store</p>";
+
+        await _emailService.SendEmailAsync(recipientEmail, subject, messageBody);
 
         return Ok("Регистрацията е успешна!");
     }
@@ -67,7 +82,7 @@ public class AuthController : ControllerBase
         var claims = new List<Claim>
     {
         new Claim(ClaimTypes.Name, user.Email),
-        new Claim(ClaimTypes.Role, user.Role) // Тук user.Role трябва да е стринг "Admin" или "User"
+        new Claim(ClaimTypes.Role, user.Role)
     };
 
         var token = new JwtSecurityToken(

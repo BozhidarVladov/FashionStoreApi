@@ -14,5 +14,7 @@ namespace VladovClothingStore.Dtos
 
         [Required(ErrorMessage = "Трябва да посочите валидна категория!")]
         public int CategoryId { get; set; }
+
+        public string ImageUrl { get; set; } = string.Empty;
     }
 }

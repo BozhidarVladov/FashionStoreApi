@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using VladovClothingStore.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 

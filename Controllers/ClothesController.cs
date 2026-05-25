@@ -7,6 +7,7 @@ using VladovClothingStore.Services;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Org.BouncyCastle.Utilities.Collections;
 
 namespace VladovClothingStore.Controllers;
 
@@ -16,10 +17,11 @@ namespace VladovClothingStore.Controllers;
 public class ClothesController : ControllerBase
 {
     private readonly IStoreService _service;
-
-    public ClothesController(IStoreService service)
+    private readonly IEmailService _emailService;
+    public ClothesController(IStoreService service, IEmailService emailService)
     {
         _service = service;
+        _emailService = emailService;
     }
 
     [HttpGet]
@@ -41,7 +43,9 @@ public class ClothesController : ControllerBase
         {
             Name = dto.Name,
             Price = dto.Price,
-            CategoryId = dto.CategoryId
+            CategoryId = dto.CategoryId,
+            ImageUrl = dto.ImageUrl
+            
         };
 
         await _service.AddClothingAsync(item);
@@ -56,7 +60,7 @@ public class ClothesController : ControllerBase
         return NoContent();
     }
     [HttpPost("{id}/buy")]
-[Authorize]
+    [Authorize]
 public async Task<IActionResult> BuyClothing(int id)
 {
     var clothes = await _service.GetAllClothesAsync();
@@ -66,6 +70,17 @@ public async Task<IActionResult> BuyClothing(int id)
     {
         return NotFound(new { message = $"Дреха с ID {id} не беше намерена." });
     }
+    var userEmail = User.Identity?.Name ?? "bovkadov@gmail.com"; 
+    
+    string subject = $"Потвърждение за поръчка #{Guid.NewGuid().ToString().Substring(0, 8)}";
+    string messageBody = $@"
+        <h1>Благодарим ви за покупката в Vladov Clothing Store!</h1>
+        <p>Успешно закупихте: <strong>{clothing.Name}</strong></p>
+        <p>Цена: <strong>{clothing.Price} лв.</strong></p>
+        <br/>
+        <p>Поздрави,<br/>Екипът на Vladov Clothing Store</p>";
+
+        await _emailService.SendEmailAsync(userEmail, subject, messageBody);
 
     return Ok(new 
     { 

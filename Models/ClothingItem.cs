@@ -11,6 +11,7 @@ namespace VladovClothingStore.Models
         public string Name { get; set;} = string.Empty;
         [Range(0.01, 3000, ErrorMessage = "Цената трябва да е между 0.01 и 3000 евро")]
         public decimal Price { get; set;}
+        public string ImageUrl {get; set;} = string.Empty;
 
         public int CategoryId {get; set;}
 

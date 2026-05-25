@@ -28,7 +28,8 @@ public class StoreService : IStoreService
             Id = c.Id,
             Name = c.Name,
             Price = c.Price,
-            CategoryName = c.Category != null ? c.Category.Name : "No Category"
+            CategoryName = c.Category != null ? c.Category.Name : "No Category",
+            ImageUrl = c.ImageUrl
         }).ToList();
     }
 
