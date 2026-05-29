@@ -12,5 +12,6 @@ public interface IStoreService
     Task AddClothingAsync(ClothingItem item);
     Task UpdateClothingAsync(ClothingItem item);
     Task DeleteClothingAsync(int id);
+    Task<bool> CreateOrderAsync(OrderCreateDto orderDto);
 }
 }

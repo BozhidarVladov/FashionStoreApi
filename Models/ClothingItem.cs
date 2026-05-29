@@ -17,6 +17,7 @@ namespace VladovClothingStore.Models
 
         public Category? Category { get; set;}
         public List<Tag> Tags { get; set; } = new();
+        public string Description { get; set; } = string.Empty;
     }
 }
 

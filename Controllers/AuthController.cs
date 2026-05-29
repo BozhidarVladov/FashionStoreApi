@@ -44,20 +44,46 @@ public class AuthController : ControllerBase
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-        string recipientEmail = request.Email;
-        string subject = "Добре дошли във Vladov Clothing Store! 🎉";
 
-        string messageBody = $@"
-        <h1>Здравейте и добре дошли!</h1>
-        <p>Благодарим ви, че се регистрирахте във <strong>Vladov Clothing Store</strong>.</p>
-        <p>Вашият профил беше създаден успешно с имейл: <strong>{request.Email}</strong>.</p>
-        <p>Вече можете да разгледате най-новите ни колекции дрехи и да направите първата си поръчка!</p>
-        <br/>
-        <p>Поздрави,<br/>Екипът на Vladov Clothing Store</p>";
+        // 🌟 Безопасно изпращане на имейл с try-catch блок
+        try
+        {
+            string recipientEmail = request.Email;
+            string subject = "Добре дошли във Vladov Clothing Store! 🎉";
 
-        await _emailService.SendEmailAsync(recipientEmail, subject, messageBody);
+            string messageBody = $@"
+            <div style='font-family: ""Segoe UI"", Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff;'>
+                <div style='text-align: center; margin-bottom: 25px;'>
+                    <h1 style='margin: 0; color: #111; font-size: 26px; letter-spacing: 1px;'>VLADOV CLOTHING STORE</h1>
+                    <h2 style='color: #28a745; margin-top: 10px;'>Успешна регистрация!</h2>
+                </div>
+                
+                <p style='font-size: 16px; color: #333;'>Здравейте и добре дошли!</p>
+                <p style='font-size: 14px; color: #555; line-height: 1.6;'>
+                    Благодарим ви, че се регистрирахте във <strong>Vladov Clothing Store</strong>.<br/>
+                    Вашият профил беше създаден успешно с имейл: <strong style='color: #111;'>{request.Email}</strong>.
+                </p>
+                <p style='font-size: 14px; color: #555; line-height: 1.6;'>
+                    Вече можете да разгледате най-новите ни колекции дрехи и да направите първата си поръчка!
+                </p>
+                
+                <hr style='border: none; border-top: 1px solid #eee; margin: 30px 0 15px 0;' />
+                <p style='text-align: center; color: #999; font-size: 12px; margin: 0;'>
+                    Поздрави,<br/>
+                    <strong>Екипът на Vladov Clothing Store © 2026</strong>
+                </p>
+            </div>";
 
-        return Ok("Регистрацията е успешна!");
+            await _emailService.SendEmailAsync(recipientEmail, subject, messageBody);
+        }
+        catch (Exception ex)
+        {
+            // Ако Gmail/SMTP сървърът се забави, записваме грешката в конзолата, 
+            // но регистрацията на потребителя остава успешна
+            Console.WriteLine($"[Имейл Регистрация Грешка]: {ex.Message}");
+        }
+
+        return Ok(new { message = "Регистрацията е успешна!" });
     }
 
     [HttpPost("login")]
@@ -76,14 +102,16 @@ public class AuthController : ControllerBase
     private string CreateToken(User user)
     {
         Console.WriteLine($"USER ROLE: {user.Role}");
+        
+        // Твоят оригинален таен ключ си остава непокътнат и еднакъв навсякъде
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012"));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.Email),
-        new Claim(ClaimTypes.Role, user.Role)
-    };
+        {
+            new Claim(ClaimTypes.Name, user.Email),
+            new Claim(ClaimTypes.Role, user.Role)
+        };
 
         var token = new JwtSecurityToken(
             issuer: "VladovAPI",

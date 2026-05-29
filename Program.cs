@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact",
-        policy => policy.WithOrigins("http://localhost:5173") // Портът на React
+        policy => policy.WithOrigins("http://localhost:5173")
                         .AllowAnyMethod()
                         .AllowAnyHeader());
 });
@@ -128,10 +128,8 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<VladovClothingStore.ApplicationDbContext>();
     
-    // Проверяваме дали таблицата е празна, като броим редовете
     if (context.Categories.Count() == 0)
     {
-        // Създаваме категорията динамично през самия Context
         var newCategory = new VladovClothingStore.Models.Category
         {
             Id = 1,
