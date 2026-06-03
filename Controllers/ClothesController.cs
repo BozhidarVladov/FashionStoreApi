@@ -52,16 +52,13 @@ public class ClothesController : ControllerBase
         return Ok(item);
     }
 
-   // 🌟 КОРИГИРАН МЕТОД: Редакция на продукт (PUT)
 [HttpPut("{id}")]
 [Authorize(Roles = "Admin")]
 public async Task<IActionResult> Update(int id, [FromBody] ClothingUpdateDto dto)
 {
     if (dto == null)
         return BadRequest("Данните са невалидни.");
-
-    // Сглобяваме обекта директно, без да викаме GetAllClothesAsync() преди това.
-    // По този начин Entity Framework няма да има конфликт с дублирани обекти в паметта.
+        
     var itemToUpdate = new ClothingItem
     {
         Id = id,

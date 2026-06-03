@@ -19,8 +19,7 @@ function App() {
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authError, setAuthError] = useState(null);
-  
-  // Админ състояния
+
   const [isAddClothOpen, setIsAddClothOpen] = useState(false);
   const [newClothName, setNewClothName] = useState('');
   const [newClothPrice, setNewClothPrice] = useState('');
@@ -28,11 +27,9 @@ function App() {
   const [newClothImageUrl, setNewClothImageUrl] = useState('');
   const [newClothDescription, setNewClothDescription] = useState('');
 
-  // Потребителски състояния за детайли
   const [selectedCloth, setSelectedCloth] = useState(null);          
-  const [selectedQuantities, setSelectedQuantities] = useState({}); // 🌟 НОВО: Пази избраното количество за всеки продукт на витрината
+  const [selectedQuantities, setSelectedQuantities] = useState({}); 
 
-  // Състояния за доставка
   const [isCheckoutStage, setIsCheckoutStage] = useState(false); 
   const [deliveryName, setDeliveryName] = useState('');
   const [deliveryPhone, setDeliveryPhone] = useState('');
@@ -279,13 +276,11 @@ function App() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   
-  // 🌟 СМЕТКА ЗА БЕЗПЛАТНА ДОСТАВКА НАД 100 €
   const shippingCost = totalPrice >= 100 ? 0 : 5.00; 
   const finalPriceWithShipping = totalPrice + shippingCost;
 
   return (
     <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', fontFamily: 'Segoe UI, sans-serif', position: 'relative' }}>
-      {/* Навигация */}
       <nav style={{ backgroundColor: '#111', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
         <h2 style={{ margin: 0, fontSize: '24px', letterSpacing: '1px', cursor: 'pointer' }}>VLADOV CLOTHING STORE</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -309,9 +304,8 @@ function App() {
         </div>
       </nav>
 
-      {/* Продуктова витрина */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
-        {/* 🌟 БАНЕР ЗА БЕЗПЛАТНА ДОСТАВКА */}
+
         <div style={{ backgroundColor: '#111', color: '#fff', textAlign: 'center', padding: '10px', borderRadius: '6px', marginBottom: '30px', fontWeight: 'bold', letterSpacing: '0.5px', fontSize: '14px' }}>
           ✨ БЕЗПЛАТНА ДОСТАВКА ЗА ПОРЪЧКИ НАД 100.00 € | Включена опция "Преглед и тест" за всяка доставка! 📦
         </div>
@@ -322,11 +316,10 @@ function App() {
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}>
           {clothes.map((cloth) => {
-            const currentQty = selectedQuantities[cloth.id] || 1; // Вземаме текущо избраното количество за тази картичка
+            const currentQty = selectedQuantities[cloth.id] || 1;
             return (
               <div key={cloth.id} style={{ backgroundColor: '#fff', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 
-                {/* Клик тук отваря САМО описанието */}
                 <img 
                   src={cloth.imageUrl && cloth.imageUrl.trim() !== "" ? cloth.imageUrl : "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80"} 
                   alt={cloth.name} 
@@ -343,8 +336,7 @@ function App() {
                     >
                       {cloth.name}
                     </h4>
-                    
-                    {/* Избор на РАЗМЕР */}
+           
                     <div style={{ marginBottom: '12px' }}>
                       <label style={{ fontSize: '12px', color: '#666', display: 'block', marginBottom: '6px', fontWeight: '500' }}>Изберете размер:</label>
                       <div style={{ display: 'flex', gap: '6px' }}>
@@ -374,7 +366,6 @@ function App() {
                       </div>
                     </div>
 
-                    {/* 🌟 НОВО: Избор на КОЛИЧЕСТВО ДИРЕКТНО НА КАРТИЧКАТА */}
                     <div style={{ marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <label style={{ fontSize: '12px', color: '#666', fontWeight: '500' }}>Бройки (Количество):</label>
                       <select 
@@ -389,7 +380,6 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Секция ЦЕНА и КУПИ */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
                     <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#111' }}>{cloth.price ? cloth.price.toFixed(2) : '0.00'} €</span>
                     
@@ -418,7 +408,6 @@ function App() {
         </div>
       </div>
 
-      {/* Модал за Описание и състав (Само за четене на детайли) */}
       {selectedCloth && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ backgroundColor: '#fff', padding: '30px', borderRadius: '12px', width: '480px', boxShadow: '0 10px 30px rgba(0,0,0,0.3)', position: 'relative', display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -449,7 +438,6 @@ function App() {
         </div>
       )}
 
-      {/* Количка */}
       {isCartOpen && (
         <div style={{ position: 'fixed', top: 0, right: 0, width: '380px', height: '100vh', backgroundColor: '#fff', boxShadow: '-5px 0 25px rgba(0,0,0,0.15)', zIndex: 1000, display: 'flex', flexDirection: 'column', padding: '20px', boxSizing: 'border-box' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '15px', marginBottom: '20px' }}>
@@ -494,7 +482,6 @@ function App() {
                     <span>{totalPrice.toFixed(2)} €</span>
                   </div>
                   
-                  {/* ДИНАМИЧНО ИЗПИСВАНЕ НА ДОСТАВКАТА */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', marginBottom: '15px', color: shippingCost === 0 ? '#28a745' : '#111', fontWeight: shippingCost === 0 ? 'bold' : 'normal' }}>
                     <span>Доставка:</span>
                     <span>{shippingCost === 0 ? 'БЕЗПЛАТНА 🎉' : `${shippingCost.toFixed(2)} €`}</span>
@@ -522,11 +509,10 @@ function App() {
               )}
             </>
           ) : (
-            /* ФОРМА ЗА АДРЕС С ОПЦИЯ ПРЕГЛЕД И ТЕСТ */
+
             <form onSubmit={handleFinalOrderSubmit} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', overflowY: 'auto' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                
-                {/* ИНФО КАРТИЧКА ЗА ЗАЩИТА НА КУПУВАЧА */}
+
                 <div style={{ backgroundColor: '#e9f7ef', border: '1px solid #28a745', padding: '10px', borderRadius: '6px', fontSize: '13px', color: '#196f3d', fontWeight: '500' }}>
                   🔍 <strong>Включена опция: Преглед и Тест!</strong> Имената и пратката ще бъдат изпратени с право да отворите и пробвате дрехите преди да платите на куриера.
                 </div>
@@ -575,7 +561,7 @@ function App() {
         </div>
       )}
 
-      {/* Админ модал */}
+    
       {isAddClothOpen && (
   <div style={{ 
     position: 'fixed', 
@@ -589,12 +575,12 @@ function App() {
     padding: '20px',
     boxSizing: 'border-box'
   }}>
-    {/* Бутон за затваряне на Админ Панела и връщане към витрината */}
+
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '10px 0', display: 'flex', justifyContent: 'flex-end' }}>
       <button 
         onClick={() => { 
           setIsAddClothOpen(false); 
-          loadClothes(); // 🔄 Опреснява продуктите на главния екран веднага след затваряне
+          loadClothes(); 
         }} 
         style={{ 
           padding: '10px 20px', 
@@ -612,12 +598,12 @@ function App() {
       </button>
     </div>
     
-    {/* Вграждаме новия мощен Админ Панел */}
+    
     <AdminPanel />
   </div>
 )}
 
-      {/* История на поръчките */}
+     
       {isHistoryOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ backgroundColor: '#fff', padding: '30px', borderRadius: '8px', width: '550px', maxHeight: '80vh', overflowY: 'auto', position: 'relative' }}>
@@ -651,14 +637,13 @@ function App() {
         </div>
       )}
 
-      {/* Toast Известия */}
       {showToast && (
         <div style={{ position: 'fixed', bottom: '30px', left: '30px', backgroundColor: '#111', color: '#fff', padding: '16px 28px', borderRadius: '8px', zIndex: 3000, fontSize: '14px', fontWeight: '600' }}>
           {toastMessage}
         </div>
       )}
 
-      {/* Логин модал */}
+  
       {isAuthOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ backgroundColor: '#fff', padding: '30px', borderRadius: '8px', width: '340px', position: 'relative' }}>

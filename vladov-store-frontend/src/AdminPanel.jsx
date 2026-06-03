@@ -7,9 +7,8 @@ const AdminPanel = () => {
     { id: 2, name: "Суитшърти" },
     { id: 3, name: "Якета" },
     { id: 4, name: "Дънки" }
-  ]); // Можеш да промениш тези имена според твоите категории в базата данни!
+  ]); 
 
-  // Състояние на формата
   const [formData, setFormData] = useState({
     id: null,
     name: '',
@@ -22,10 +21,10 @@ const AdminPanel = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState('');
 
-  // Вземане на токена за Admin права
+  
   const token = localStorage.getItem('token'); 
 
-  // 1. Зареждане на продуктите при отваряне на страницата
+  
   const fetchClothes = async () => {
     try {
       const response = await fetch('http://localhost:5010/api/clothes');
@@ -42,7 +41,6 @@ const AdminPanel = () => {
     fetchClothes();
   }, []);
 
-  // Хендлър за промяна на полетата във формата
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -50,7 +48,6 @@ const AdminPanel = () => {
     });
   };
 
-  // 2. Добавяне или Редактиране на продукт
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -65,7 +62,7 @@ const AdminPanel = () => {
         method: method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Задължително пращаме токена на Админа
+          'Authorization': `Bearer ${token}` 
         },
         body: JSON.stringify({
           name: formData.name,
@@ -79,7 +76,7 @@ const AdminPanel = () => {
       if (response.ok) {
         setMessage(isEditing ? "Продуктът е обновен успешно! 🎉" : "Продуктът е добавен успешно! 🚀");
         resetForm();
-        fetchClothes(); // Презареждаме списъка
+        fetchClothes();
       } else {
         const errText = await response.text();
         setMessage(`Грешка: ${errText || 'Неуспешна операция'}`);
@@ -89,7 +86,6 @@ const AdminPanel = () => {
     }
   };
 
-  // 3. Изтриване на продукт
   const handleDelete = async (id) => {
     if (!window.confirm("Сигурни ли сте, че искате да изтриете този продукт?")) return;
 
@@ -112,10 +108,10 @@ const AdminPanel = () => {
     }
   };
 
-  // Зареждане на данни за редакция
+  
   const startEdit = (item) => {
     setIsEditing(true);
-    // Намираме ID на категорията по име или слагаме 1 по подразбиране
+
     const cat = categories.find(c => c.name === item.categoryName) || { id: 1 };
     
     setFormData({
@@ -141,7 +137,6 @@ const AdminPanel = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '4px', alignItems: 'start' }}>
         
-        {/* ФОРМА ЗА ДОБАВЯНЕ / РЕДАКЦИЯ */}
         <div style={{ backgroundColor: '#f8f9fa', padding: '25px', borderRadius: '8px', border: '1px solid #ddd' }}>
           <h3>{isEditing ? "📝 Редактирай продукт" : "➕ Добави нов продукт"}</h3>
           <form onSubmit={handleSubmit}>
@@ -184,7 +179,6 @@ const AdminPanel = () => {
           </form>
         </div>
 
-        {/* ТАБЛИЦА С ТЕКУЩИТЕ ПРОДУКТИ */}
         <div style={{ paddingLeft: '20px' }}>
           <h3>📦 Всички налични продукти ({clothes.length})</h3>
           <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', border: '1px solid #ddd' }}>

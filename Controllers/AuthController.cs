@@ -78,8 +78,6 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Ако Gmail/SMTP сървърът се забави, записваме грешката в конзолата, 
-            // но регистрацията на потребителя остава успешна
             Console.WriteLine($"[Имейл Регистрация Грешка]: {ex.Message}");
         }
 
