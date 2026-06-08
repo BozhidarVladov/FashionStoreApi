@@ -39,13 +39,11 @@ public class AuthController : ControllerBase
         {
             Email = request.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            Role = "Admin"
+            Role = "User"
         };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-
-        // 🌟 Безопасно изпращане на имейл с try-catch блок
         try
         {
             string recipientEmail = request.Email;
@@ -99,9 +97,7 @@ public class AuthController : ControllerBase
 
     private string CreateToken(User user)
     {
-        Console.WriteLine($"USER ROLE: {user.Role}");
-        
-        // Твоят оригинален таен ключ си остава непокътнат и еднакъв навсякъде
+        Console.WriteLine($"USER ROLE: {user.Role}"); 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("vladovstoresecretkey123456789012"));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

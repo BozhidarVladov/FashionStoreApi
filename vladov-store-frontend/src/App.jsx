@@ -389,7 +389,7 @@ function App() {
                           onClick={() => handleDeleteCloth(cloth.id)} 
                           style={{ backgroundColor: '#ff4d4d', color: '#fff', border: 'none', padding: '10px 12px', borderRadius: '4px', fontWeight: '600', cursor: 'pointer' }}
                         >
-                          🗑️
+                          
                         </button>
                       )}
                       <button 
