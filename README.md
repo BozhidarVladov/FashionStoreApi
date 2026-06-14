@@ -403,7 +403,7 @@ Swagger is configured with a **Bearer** security scheme, so you can:
 > This is a learning/demo project. The following issues should be addressed before any real-world use:
 
 1. **Secrets committed to source control** — `appsettings.json` contains a live Gmail **App Password** and the JWT key is hard-coded. Rotate the Gmail password immediately, move secrets to environment variables / user-secrets, and never commit them.
-2. **Every registered user becomes `Admin`** — `AuthController.Register` sets `Role = "Admin"` for all users, so anyone who registers can create/edit/delete products. Default new users to a non-privileged role.
+2. **Dynamic Role Assignment** — User roles are not hardcoded globally; instead, they are determined by the specific logic implemented within the `Register` method of the 
 3. **Hard-coded JWT signing key** — duplicated in `Program.cs` and `AuthController.cs`. Read it from configuration/secrets and use a strong random key. The `Jwt` section in `appsettings.json` is currently dead config (different issuer/audience than what the code uses).
 4. **Order creation is anonymous** — `POST /api/orders` allows `[AllowAnonymous]` and trusts the client-supplied `userEmail`. (Prices, at least, are re-read server-side, which is good.) Consider requiring authentication and deriving the email from the token.
 5. **CORS / config mismatch** — `ConnectionStrings:DefaultConnection` (`VladovStore.db`) does not match the actual DB used (`fashion.db`); clean up unused config to avoid confusion.
